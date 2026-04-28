@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { AnimatedSection } from '@/components/ui/AnimatedSection'
 import { contactData } from '@/lib/data'
+import { supabase } from '@/lib/supabase'
 
 const iconMap: Record<string, React.ReactNode> = {
   mapPin: (
@@ -23,12 +24,46 @@ const iconMap: Record<string, React.ReactNode> = {
 }
 
 export function Contact() {
+  const [loading, setLoading] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    company: '',
+    service: '',
+    message: '',
+  })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => setSubmitted(false), 3000)
+    setLoading(true)
+
+    try {
+      const { error } = await supabase.from('contacts').insert([
+        {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          message: formData.message,
+          // (company와 service 필드는 contacts 테이블에 추가되어 있다면 더 넣을 수 있습니다.)
+        },
+      ])
+
+      if (error) throw error
+      
+      setSubmitted(true)
+      setFormData({ name: '', email: '', phone: '', company: '', service: '', message: '' })
+    } catch (err) {
+      console.error('Error submitting form:', err)
+      alert('문의 전송 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -93,6 +128,12 @@ export function Contact() {
                     </div>
                     <h4 className="text-xl font-bold text-neutral-100 mb-2">감사합니다!</h4>
                     <p className="text-neutral-400">담당 파트너가 24시간 내에 연락드리겠습니다.</p>
+                    <button 
+                      onClick={() => setSubmitted(false)}
+                      className="mt-8 text-brand-400 text-sm hover:underline"
+                    >
+                      새 문의 작성하기
+                    </button>
                   </motion.div>
                 ) : (
                   <form onSubmit={handleSubmit} className="space-y-5">
@@ -101,6 +142,9 @@ export function Contact() {
                         <label className="block text-sm text-neutral-400 mb-2">이름 *</label>
                         <input
                           type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleChange}
                           required
                           className="w-full bg-navy-800/60 border border-navy-700/50 rounded-lg px-4 py-3 text-neutral-200 text-sm placeholder-neutral-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/25 transition-all"
                           placeholder="홍길동"
@@ -110,6 +154,9 @@ export function Contact() {
                         <label className="block text-sm text-neutral-400 mb-2">회사명</label>
                         <input
                           type="text"
+                          name="company"
+                          value={formData.company}
+                          onChange={handleChange}
                           className="w-full bg-navy-800/60 border border-navy-700/50 rounded-lg px-4 py-3 text-neutral-200 text-sm placeholder-neutral-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/25 transition-all"
                           placeholder="회사명을 입력하세요"
                         />
@@ -121,6 +168,9 @@ export function Contact() {
                         <label className="block text-sm text-neutral-400 mb-2">이메일 *</label>
                         <input
                           type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleChange}
                           required
                           className="w-full bg-navy-800/60 border border-navy-700/50 rounded-lg px-4 py-3 text-neutral-200 text-sm placeholder-neutral-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/25 transition-all"
                           placeholder="email@example.com"
@@ -130,6 +180,9 @@ export function Contact() {
                         <label className="block text-sm text-neutral-400 mb-2">연락처</label>
                         <input
                           type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleChange}
                           className="w-full bg-navy-800/60 border border-navy-700/50 rounded-lg px-4 py-3 text-neutral-200 text-sm placeholder-neutral-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/25 transition-all"
                           placeholder="010-0000-0000"
                         />
@@ -138,7 +191,12 @@ export function Contact() {
 
                     <div>
                       <label className="block text-sm text-neutral-400 mb-2">관심 서비스</label>
-                      <select className="w-full bg-navy-800/60 border border-navy-700/50 rounded-lg px-4 py-3 text-neutral-200 text-sm focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/25 transition-all">
+                      <select 
+                        name="service"
+                        value={formData.service}
+                        onChange={handleChange}
+                        className="w-full bg-navy-800/60 border border-navy-700/50 rounded-lg px-4 py-3 text-neutral-200 text-sm focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/25 transition-all"
+                      >
                         <option value="">선택해 주세요</option>
                         <option value="strategy">전략 컨설팅</option>
                         <option value="digital">디지털 트랜스포메이션</option>
@@ -151,6 +209,9 @@ export function Contact() {
                     <div>
                       <label className="block text-sm text-neutral-400 mb-2">메시지 *</label>
                       <textarea
+                        name="message"
+                        value={formData.message}
+                        onChange={handleChange}
                         required
                         rows={4}
                         className="w-full bg-navy-800/60 border border-navy-700/50 rounded-lg px-4 py-3 text-neutral-200 text-sm placeholder-neutral-600 focus:outline-none focus:border-brand-500/50 focus:ring-1 focus:ring-brand-500/25 transition-all resize-none"
@@ -160,9 +221,10 @@ export function Contact() {
 
                     <button
                       type="submit"
-                      className="btn-gold w-full py-4 rounded-lg text-base"
+                      disabled={loading}
+                      className="btn-gold w-full py-4 rounded-lg text-base disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      문의 보내기
+                      {loading ? '전송 중...' : '문의 보내기'}
                     </button>
                     <p className="text-neutral-600 text-xs text-center">
                       제출하신 정보는 상담 목적으로만 사용됩니다.
