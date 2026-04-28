@@ -1,24 +1,165 @@
 @import 'tailwindcss';
 
-/* ── Font ───────────────────────────────────────────
- *  `--font-sans` is injected by `next/font/google` in
- *  layout.tsx. No fixed font is baked into this template
- *  — designer picks fonts based on project mood.
- * ──────────────────────────────────────────────────── */
+/* ── Theme Definition ────────────────────────────── */
 @theme {
-  --font-sans: var(--font-sans), system-ui, -apple-system, sans-serif;
+  /* Fonts */
+  --font-sans: var(--font-sans), 'Noto Sans KR', system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-display), 'Playfair Display', Georgia, serif;
+
+  /* Brand Colors (Gold) */
+  --color-brand-50: #fefdf8;
+  --color-brand-100: #fdf9e8;
+  --color-brand-200: #faf0c5;
+  --color-brand-300: #f5e299;
+  --color-brand-400: #efd06a;
+  --color-brand-500: #d4a843;
+  --color-brand-600: #b8892e;
+  --color-brand-700: #966c24;
+  --color-brand-800: #7a5522;
+  --color-brand-900: #664721;
+  --color-brand-950: #3b250f;
+
+  /* Navy Colors */
+  --color-navy-50: #f4f6fb;
+  --color-navy-100: #e8ecf6;
+  --color-navy-200: #ccd5eb;
+  --color-navy-300: #a0b0da;
+  --color-navy-400: #6d86c4;
+  --color-navy-500: #4a66ae;
+  --color-navy-600: #384f92;
+  --color-navy-700: #2e4077;
+  --color-navy-800: #293863;
+  --color-navy-900: #1a2340;
+  --color-navy-950: #0d1220;
 }
 
-/* ── Custom utility layer ────────────────────────────
- *  Add project-wide overrides here.
- * ──────────────────────────────────────────────────── */
+/* ── Base styles ─────────────────────────────────── */
 @layer base {
   body {
-    @apply bg-neutral-50 text-neutral-900 antialiased;
+    @apply bg-navy-950 text-neutral-100 antialiased;
+  }
+
+  ::selection {
+    background: rgba(212, 168, 67, 0.3);
+    color: #fff;
   }
 }
 
-/* ── Smooth scroll ───────────────────────────────────  */
+/* ── Smooth scroll ───────────────────────────────── */
 html {
   scroll-behavior: smooth;
+}
+
+/* ── Custom scrollbar ────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0d1220;
+}
+::-webkit-scrollbar-thumb {
+  background: #293863;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #384f92;
+}
+
+/* ── Gold gradient text ──────────────────────────── */
+.text-gold-gradient {
+  background: linear-gradient(135deg, #d4a843 0%, #f5e299 50%, #d4a843 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Section divider ─────────────────────────────── */
+.section-divider {
+  width: 60px;
+  height: 2px;
+  background: linear-gradient(90deg, #d4a843, #f5e299);
+}
+
+/* ── Glass card ──────────────────────────────────── */
+.glass-card {
+  background: rgba(26, 35, 64, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(212, 168, 67, 0.1);
+}
+
+.glass-card:hover {
+  background: rgba(26, 35, 64, 0.8);
+  border-color: rgba(212, 168, 67, 0.25);
+}
+
+/* ── Animated underline ──────────────────────────── */
+.animated-underline {
+  position: relative;
+}
+.animated-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: linear-gradient(90deg, #d4a843, #f5e299);
+  transition: width 0.3s ease;
+}
+.animated-underline:hover::after {
+  width: 100%;
+}
+
+/* ── Hero gradient background ────────────────────── */
+.hero-gradient {
+  background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(41, 56, 99, 0.5), transparent),
+              radial-gradient(ellipse 60% 40% at 80% 50%, rgba(212, 168, 67, 0.05), transparent),
+              linear-gradient(180deg, #0d1220 0%, #1a2340 100%);
+}
+
+/* ── Progress bar animation ──────────────────────── */
+@keyframes progressFill {
+  from { width: 0; }
+  to { width: var(--progress); }
+}
+
+.progress-bar {
+  animation: progressFill 1.5s ease-out forwards;
+}
+
+/* ── Subtle float ────────────────────────────────── */
+@keyframes subtleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.floating {
+  animation: subtleFloat 6s ease-in-out infinite;
+}
+
+/* ── Gradient border button ──────────────────────── */
+.btn-gold {
+  position: relative;
+  background: linear-gradient(135deg, #d4a843, #b8892e);
+  color: #0d1220 !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+.btn-gold:hover {
+  background: linear-gradient(135deg, #efd06a, #d4a843);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 30px rgba(212, 168, 67, 0.3);
+}
+
+.btn-outline-gold {
+  position: relative;
+  border: 1px solid rgba(212, 168, 67, 0.4);
+  color: #d4a843;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+.btn-outline-gold:hover {
+  border-color: #d4a843;
+  background: rgba(212, 168, 67, 0.08);
+  transform: translateY(-1px);
 }
